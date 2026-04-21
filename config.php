@@ -1,51 +1,39 @@
 <?php
-/**
- * Notes App - Configuration File
- * Contains all database and application settings
- */
-
-// ============ DATABASE CONFIGURATION ============
+// DATABASE CONFIGURATION 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'notes_app');
 define('DB_PORT', 3306);
 
-// ============ APPLICATION SETTINGS ============
+// APPLICATION SETTINGS 
 define('APP_NAME', 'Notes App');
 define('APP_URL', 'http://localhost/notes-app');
 define('APP_TIMEZONE', 'Asia/Ho_Chi_Minh');
 
-// ============ SECURITY SETTINGS ============
-define('SESSION_TIMEOUT', 86400); // 24 hours
+// SECURITY SETTINGS
+define('SESSION_TIMEOUT', 86400); 
 define('BCRYPT_COST', 12);
-define('TOKEN_EXPIRY', 3600); // 1 hour
-define('OTP_EXPIRY', 600); // 10 minutes
+define('TOKEN_EXPIRY', 3600); 
+define('OTP_EXPIRY', 600); 
 
-// ============ EMAIL CONFIGURATION ============
-// For Gmail: Use App Password from https://myaccount.google.com/apppasswords
+// EMAIL CONFIGURATION 
 define('SMTP_HOST', 'smtp.gmail.com');
 define('SMTP_PORT', 587);
-define('SMTP_USER', 'your-email@gmail.com'); // Change this
-define('SMTP_PASS', 'your-app-password');     // Change this
+define('SMTP_USER', 'your-email@gmail.com'); 
+define('SMTP_PASS', 'your-app-password');     
 define('SMTP_FROM', 'noreply@notesapp.local');
 define('SMTP_FROM_NAME', 'Notes App');
 
-// Alternative: Mailtrap.io
-// define('SMTP_HOST', 'smtp.mailtrap.io');
-// define('SMTP_PORT', 465);
-// define('SMTP_USER', 'your-username');
-// define('SMTP_PASS', 'your-password');
-
-// ============ FILE UPLOAD SETTINGS ============
+// FILE UPLOAD SETTINGS 
 define('MAX_UPLOAD_SIZE', 5242880); // 5MB
 define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif']);
 define('UPLOAD_DIR', __DIR__ . '/uploads');
 
-// ============ PAGINATION ============
+//  PAGINATION 
 define('ITEMS_PER_PAGE', 12);
 
-// ============ ENABLE ERROR REPORTING (Development Only) ============
+// ENABLE ERROR REPORTING
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -58,7 +46,7 @@ if (!is_dir(UPLOAD_DIR)) {
     mkdir(UPLOAD_DIR, 0755, true);
 }
 
-// ============ DATABASE CONNECTION ============
+//  DATABASE CONNECTION 
 try {
     $pdo = new PDO(
         "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";port=" . DB_PORT . ";charset=utf8mb4",
@@ -74,46 +62,28 @@ try {
     die('<h1>Database Connection Error</h1><p>Unable to connect to the database. Please check your configuration.</p><p>Error: ' . htmlspecialchars($e->getMessage()) . '</p>');
 }
 
-// ============ HELPER FUNCTIONS ============
+// HELPER FUNCTION
 
-/**
- * Sanitize input string
- */
 function sanitize_input($data) {
     return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
 }
 
-/**
- * Generate random token
- */
 function generate_token($length = 32) {
     return bin2hex(random_bytes($length));
 }
 
-/**
- * Generate OTP (6 digits)
- */
 function generate_otp() {
     return str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 }
 
-/**
- * Hash password using bcrypt
- */
 function hash_password($password) {
     return password_hash($password, PASSWORD_BCRYPT, ['cost' => BCRYPT_COST]);
 }
 
-/**
- * Verify password
- */
 function verify_password($password, $hash) {
     return password_verify($password, $hash);
 }
 
-/**
- * Check if password meets requirements
- */
 function validate_password($password) {
     $errors = [];
     
@@ -136,9 +106,6 @@ function validate_password($password) {
     return $errors;
 }
 
-/**
- * Validate email
- */
 function validate_email($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
@@ -153,9 +120,6 @@ function get_base_url() {
     return $protocol . '://' . $host . $path;
 }
 
-/**
- * JSON response helper
- */
 function json_response($status, $message, $data = null) {
     header('Content-Type: application/json');
     echo json_encode([
@@ -166,23 +130,14 @@ function json_response($status, $message, $data = null) {
     exit;
 }
 
-/**
- * Check if user is authenticated
- */
 function is_authenticated() {
     return isset($_SESSION['user_id']);
 }
 
-/**
- * Get current user ID
- */
 function get_user_id() {
     return $_SESSION['user_id'] ?? null;
 }
 
-/**
- * Redirect to login if not authenticated
- */
 function require_login() {
     if (!is_authenticated()) {
         header('Location: ' . APP_URL . '/login.php');
@@ -190,16 +145,10 @@ function require_login() {
     }
 }
 
-/**
- * Escape HTML output
- */
 function e($text) {
     return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 }
 
-/**
- * Log activity
- */
 function log_activity($user_id, $action, $resource, $resource_id = null, $details = null) {
     global $pdo;
     try {
